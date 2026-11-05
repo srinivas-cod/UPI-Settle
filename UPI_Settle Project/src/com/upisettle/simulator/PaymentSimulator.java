@@ -18,34 +18,31 @@ public class PaymentSimulator {
             String merchantId,
             int count) {
 
-        List<PaymentTransaction> transactions =
-                new ArrayList<>();
+        List<PaymentTransaction> transactions = new ArrayList<>();
+        LocalDateTime baseTime = LocalDateTime.now().minusHours(8); // Start 8 hours ago
 
         for (int i = 1; i <= count; i++) {
 
-            String transactionId =
-                    String.format("TXN%04d", i);
+            String transactionId = String.format("TXN%04d", i);
 
-            BigDecimal amount =
-                    BigDecimal.valueOf(
-                            50 + random.nextInt(4951)
-                    );
+            BigDecimal amount = BigDecimal.valueOf(
+                    50 + random.nextInt(4951)
+            );
 
-            PaymentStatus status =
-                    generateStatus();
+            PaymentStatus status = generateStatus();
+            PaymentMethod method = generatePaymentMethod();
 
-            PaymentMethod method =
-                    generatePaymentMethod();
+            // Realistic staggered timestamp across the business day
+            LocalDateTime timestamp = baseTime.plusMinutes((long) i * 20 + random.nextInt(10));
 
-            PaymentTransaction transaction =
-                    new PaymentTransaction(
-                            transactionId,
-                            merchantId,
-                            amount,
-                            status,
-                            method,
-                            LocalDateTime.now()
-                    );
+            PaymentTransaction transaction = new PaymentTransaction(
+                    transactionId,
+                    merchantId,
+                    amount,
+                    status,
+                    method,
+                    timestamp
+            );
 
             transactions.add(transaction);
         }
@@ -54,30 +51,21 @@ public class PaymentSimulator {
     }
 
     private PaymentStatus generateStatus() {
-
         int value = random.nextInt(100);
 
         if (value < 80) {
             return PaymentStatus.SUCCESS;
-
         } else if (value < 90) {
             return PaymentStatus.PENDING;
-
         } else if (value < 97) {
             return PaymentStatus.FAILED;
-
         } else {
             return PaymentStatus.REFUNDED;
         }
     }
 
     private PaymentMethod generatePaymentMethod() {
-
-        PaymentMethod[] methods =
-                PaymentMethod.values();
-
-        return methods[
-                random.nextInt(methods.length)
-                ];
+        PaymentMethod[] methods = PaymentMethod.values();
+        return methods[random.nextInt(methods.length)];
     }
 }

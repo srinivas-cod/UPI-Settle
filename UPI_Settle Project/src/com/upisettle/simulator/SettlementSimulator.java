@@ -14,8 +14,7 @@ public class SettlementSimulator {
     public List<SettlementRecord> generateSettlements(
             List<PaymentTransaction> transactions) {
 
-        List<SettlementRecord> settlements =
-                new ArrayList<>();
+        List<SettlementRecord> settlements = new ArrayList<>();
 
         int settlementCounter = 1;
         int scenarioCounter = 0;
@@ -27,54 +26,47 @@ public class SettlementSimulator {
                 continue;
             }
 
+            // Settlement realistically occurs 1-2 hours after the payment
+            LocalDateTime settlementTime = transaction.getTimestamp().plusHours(1).plusMinutes(15);
+
             int scenario = scenarioCounter % 4;
 
             // Scenario 0: Correct settlement
             if (scenario == 0) {
-
                 settlements.add(
                         new SettlementRecord(
                                 String.format("SET%04d", settlementCounter++),
                                 transaction.getTransactionId(),
                                 transaction.getAmount(),
-                                LocalDateTime.now()
+                                settlementTime
                         )
                 );
             }
-
             // Scenario 1: Amount mismatch
             else if (scenario == 1) {
-
-                BigDecimal incorrectAmount =
-                        transaction.getAmount().subtract(
-                                BigDecimal.TEN
-                        );
+                BigDecimal incorrectAmount = transaction.getAmount().subtract(BigDecimal.TEN);
 
                 settlements.add(
                         new SettlementRecord(
                                 String.format("SET%04d", settlementCounter++),
                                 transaction.getTransactionId(),
                                 incorrectAmount,
-                                LocalDateTime.now()
+                                settlementTime
                         )
                 );
             }
-
             // Scenario 2: Missing settlement
             else if (scenario == 2) {
-
-                // Intentionally do nothing
+                // Intentionally do nothing (bank missed this settlement)
             }
-
             // Scenario 3: Duplicate settlement
             else {
-
                 settlements.add(
                         new SettlementRecord(
                                 String.format("SET%04d", settlementCounter++),
                                 transaction.getTransactionId(),
                                 transaction.getAmount(),
-                                LocalDateTime.now()
+                                settlementTime
                         )
                 );
 
@@ -83,7 +75,7 @@ public class SettlementSimulator {
                                 String.format("SET%04d", settlementCounter++),
                                 transaction.getTransactionId(),
                                 transaction.getAmount(),
-                                LocalDateTime.now()
+                                settlementTime.plusMinutes(45) // Duplicate processed 45 mins later
                         )
                 );
             }
