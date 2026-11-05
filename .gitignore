@@ -1,0 +1,27 @@
+# Java compiled binaries
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+!lib/*.jar
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.ipr
+*.iml
+
+# Visual Studio Code
+.vscode/
+
+# Build outputs
+out/
+target/
+build/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
